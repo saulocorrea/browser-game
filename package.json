@@ -1,0 +1,17 @@
+{
+  "name": "browser-game",
+  "version": "1.0.0",
+  "description": "Game made with HTML Canvas/CSS/JS",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "live-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "live-server": "^1.2.2"
+  }
+}
