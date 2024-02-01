@@ -173,23 +173,23 @@ window.addEventListener('load', function () {
         draw(context) {
             this.drawAmmoBar(context);
         }
-        
+
         drawAmmoBar(context) {
             context.fillStyle = this.ammoBar.backgroundColor;
-            
+
             context.fillRect(
-                this.ammoBar.x, 
-                this.ammoBar.y, 
-                this.ammoBar.width * this.game.maxAmmo, 
+                this.ammoBar.x,
+                this.ammoBar.y,
+                this.ammoBar.width * this.game.maxAmmo,
                 this.ammoBar.height);
 
             context.fillStyle = this.ammoBar.color;
 
             for (let i = 0; i < this.game.ammo; i++) {
                 context.fillRect(
-                    this.ammoBar.x + this.ammoBar.width * i, 
-                    this.ammoBar.y, 
-                    this.ammoBar.width, 
+                    this.ammoBar.x + this.ammoBar.width * i,
+                    this.ammoBar.y,
+                    this.ammoBar.width,
                     this.ammoBar.height);
             }
         }
@@ -225,7 +225,12 @@ window.addEventListener('load', function () {
                 this.ammoTimer += deltaTime;
             }
 
-            this.enemies.forEach(enemy => enemy.update());
+            this.enemies.forEach(enemy => {
+                enemy.update();
+                if (this.checkCollision(this.player, enemy)) {
+                    enemy.markForDeletion = true;
+                }
+            });
             this.enemies = this.enemies.filter(enemy => !enemy.markForDeletion);
 
             if (!this.gameOver && this.enemyTimer > this.enemyInterval) {
@@ -246,6 +251,15 @@ window.addEventListener('load', function () {
 
         addEnemy() {
             this.enemies.push(new Angler1(this));
+        }
+
+        checkCollision(rect1, rect2) {
+            return (
+                rect1.x < rect2.x + rect2.width &&
+                rect1.x + rect1.width > rect2.x &&
+                rect1.y < rect2.y + rect2.height &&
+                rect1.y + rect1.height > rect2.y
+            );
         }
     }
 
