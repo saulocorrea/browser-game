@@ -136,7 +136,7 @@ window.addEventListener('load', function () {
         constructor(game) {
             this.game = game;
             this.x = this.game.width;
-            this.speedX = Math.random() * 1.5 + 100;
+            this.speedX = Math.random() * 90 + 30;
             this.markForDeletion = false;
             this.lives = Enemy.lives;
             this.score = this.lives;
