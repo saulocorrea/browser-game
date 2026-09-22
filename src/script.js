@@ -31,18 +31,23 @@ window.addEventListener('load', function () {
     }
 
     class Projectile {
+        static fillStyle = 'red';
+        static width = 10;
+        static height = 7;
+        static speed = 1000;
+
         constructor(game, x, y) {
             this.game = game;
             this.x = x;
             this.y = y;
-            this.width = 10;
-            this.height = 7;
-            this.speed = 10;
+            this.width = Projectile.width;
+            this.height = Projectile.height;
+            this.speed = Projectile.speed;
             this.markForDeletion = false;
         }
 
-        update() {
-            this.x += this.speed;
+        update(deltaTimeSeconds) {
+            this.x += this.speed * deltaTimeSeconds;
 
             if (this.x > this.game.width - this.width) {
                 this.markForDeletion = true;
@@ -50,7 +55,7 @@ window.addEventListener('load', function () {
         }
 
         draw(context) {
-            context.fillStyle = 'orange';
+            context.fillStyle = Projectile.fillStyle;
             context.fillRect(this.x, this.y, this.width, this.height);
         }
     }
@@ -60,19 +65,26 @@ window.addEventListener('load', function () {
     }
 
     class Player {
+        static fillStyle = 'black';
+        static width = 120;
+        static height = 190;
+        static x = 20;
+        static y = 100;
+        static speed = 200;
+
         constructor(game) {
             this.game = game;
-            this.width = 120;
-            this.height = 190;
-            this.x = 20;
-            this.y = 100;
+            this.width = Player.width;
+            this.height = Player.height;
+            this.x = Player.x;
+            this.y = Player.y;
             this.speedX = 0;
             this.speedY = 0;
-            this.speed = 5;
+            this.speed = Player.speed;
             this.projectiles = [];
         }
 
-        update() {
+        update(deltaTimeSeconds) {
             this.speedX = 0;
             this.speedY = 0;
 
@@ -89,45 +101,49 @@ window.addEventListener('load', function () {
                 this.speedX = this.speed;
             }
 
-            this.x += this.speedX;
-            this.y += this.speedY;
+            this.x += this.speedX * deltaTimeSeconds;
+            this.y += this.speedY * deltaTimeSeconds;
 
             if (this.game.keys.indexOf(' ') >= 0) {
                 this.shootTop();
                 this.game.keys.splice(this.game.keys.indexOf(' '), 1);
             }
 
-            this.projectiles.forEach(projectile => projectile.update());
+            this.projectiles.forEach(projectile => projectile.update(deltaTimeSeconds));
             this.projectiles = this.projectiles.filter(projectile => !projectile.markForDeletion);
         }
 
         draw(context) {
-            context.fillStyle = 'black';
+            context.fillStyle = Player.fillStyle;
             context.fillRect(this.x, this.y, this.width, this.height);
-
+            context.fillRect(this.x + this.width, this.y + 40, 20, 10);
+            
             this.projectiles.forEach(projectile => projectile.draw(context));
         }
 
         shootTop() {
-            if (this.game.ammo > 0) {
+            if (this.game.ammnunition > 0) {
                 this.projectiles.push(new Projectile(this.game, this.x + 100, this.y + 40));
-                this.game.ammo--;
+                this.game.ammnunition--;
             }
         }
     }
 
     class Enemy {
+        static lives = 1;
+        static font = '20px Helveltica';
+
         constructor(game) {
             this.game = game;
             this.x = this.game.width;
-            this.speedX = Math.random() * 1.5 + 0.5;
+            this.speedX = Math.random() * 1.5 + 100;
             this.markForDeletion = false;
-            this.lives = 5;
+            this.lives = Enemy.lives;
             this.score = this.lives;
         }
 
-        update() {
-            this.x -= this.speedX;
+        update(deltaTimeSeconds) {
+            this.x -= this.speedX * deltaTimeSeconds;
             if (this.x + this.width < 0) {
                 this.markForDeletion = true;
             }
@@ -137,17 +153,22 @@ window.addEventListener('load', function () {
             context.fillStyle = 'red';
             context.fillRect(this.x, this.y, this.width, this.height);
             context.fillStyle = 'black';
-            context.font = '24px Helveltica';
+            context.font = Enemy.font;
             context.fillText(this.lives, this.x, this.y);
         }
     }
 
     class Angler1 extends Enemy {
+        static width = 228 * 0.2;
+        static height = 169 * 0.2;
+        static lives = 3;
+
         constructor(game) {
             super(game);
-            this.width = 228 * 0.2;
-            this.height = 169 * 0.2;
+            this.width = Angler1.width;
+            this.height = Angler1.height;
             this.y = Math.random() * (this.game.height * 0.9 - this.height);
+            this.lives = Angler1.lives;
         }
     }
 
@@ -160,42 +181,45 @@ window.addEventListener('load', function () {
     }
 
     class UI {
+        static fontSize = 25;
+        static fontFamily = 'Helveltica';
+        static ammunitionBar = {
+            x: 20,
+            y: 50,
+            width: 10,
+            height: 10,
+            color: 'yellow',
+            backgroundColor: 'gray'
+        };
+
         constructor(game) {
             this.game = game;
-            this.fontSize = 25;
-            this.fontFamily = 'Helveltica';
-
-            this.ammoBar = {
-                x: 20,
-                y: 50,
-                width: 10,
-                height: 10,
-                color: 'yellow',
-                backgroundColor: 'gray'
-            };
+            this.fontSize = UI.fontSize;
+            this.fontFamily = UI.fontFamily;
+            this.ammunitionBar = UI.ammunitionBar;
         }
 
         draw(context) {
-            this.drawAmmoBar(context);
+            this.drawAmmunitionBar(context);
         }
 
-        drawAmmoBar(context) {
-            context.fillStyle = this.ammoBar.backgroundColor;
+        drawAmmunitionBar(context) {
+            context.fillStyle = this.ammunitionBar.backgroundColor;
 
             context.fillRect(
-                this.ammoBar.x,
-                this.ammoBar.y,
-                this.ammoBar.width * this.game.maxAmmo,
-                this.ammoBar.height);
+                this.ammunitionBar.x,
+                this.ammunitionBar.y,
+                this.ammunitionBar.width * this.game.maxAmmnunition,
+                this.ammunitionBar.height);
 
-            context.fillStyle = this.ammoBar.color;
+            context.fillStyle = this.ammunitionBar.color;
 
-            for (let i = 0; i < this.game.ammo; i++) {
+            for (let i = 0; i < this.game.ammnunition; i++) {
                 context.fillRect(
-                    this.ammoBar.x + this.ammoBar.width * i,
-                    this.ammoBar.y,
-                    this.ammoBar.width,
-                    this.ammoBar.height);
+                    this.ammunitionBar.x + this.ammunitionBar.width * i,
+                    this.ammunitionBar.y,
+                    this.ammunitionBar.width,
+                    this.ammunitionBar.height);
             }
         }
     }
@@ -211,28 +235,28 @@ window.addEventListener('load', function () {
             this.enemies = [];
             this.enemyTimer = 0;
             this.enemyInterval = 2000;
-            this.ammo = 50;
-            this.maxAmmo = 50;
-            this.ammoTimer = 0;
-            this.ammoInterval = 500;
+            this.ammnunition = 50;
+            this.maxAmmnunition = 50;
+            this.ammnunitionTimer = 0;
+            this.ammnunitionInterval = 50;
             this.gameOver = false;
             this.score = 0;
         }
 
-        update(deltaTime) {
-            this.player.update();
-
-            if (this.ammoTimer > this.ammoInterval) {
-                if (this.ammo < this.maxAmmo) {
-                    this.ammo++;
+        update(deltaTimeSeconds) {
+            this.player.update(deltaTimeSeconds);
+        
+            if (this.ammnunitionTimer > this.ammnunitionInterval) {
+                if (this.ammnunition < this.maxAmmnunition) {
+                    this.ammnunition++;
                 }
-                this.ammoTimer = 0;
+                this.ammnunitionTimer = 0;
             } else {
-                this.ammoTimer += deltaTime;
+                this.ammnunitionTimer += this.ammnunitionInterval * deltaTimeSeconds;
             }
 
             this.enemies.forEach(enemy => {
-                enemy.update();
+                enemy.update(deltaTimeSeconds);
                 if (this.checkCollision(this.player, enemy)) {
                     enemy.markForDeletion = true;
                 }
@@ -240,10 +264,10 @@ window.addEventListener('load', function () {
                     if (this.checkCollision(projectile, enemy)) {
                         projectile.markForDeletion = true;
                         enemy.lives--;
-                        if (enemy.lives <= 0) {
-                            enemy.markForDeletion = true;
-                            this.score += enemy.score;
-                        }
+                        if (enemy.lives > 0) return;
+                        
+                        enemy.markForDeletion = true;
+                        this.score += enemy.score;
                     }
                 });
             });
@@ -253,7 +277,7 @@ window.addEventListener('load', function () {
                 this.addEnemy();
                 this.enemyTimer = 0;
             } else {
-                this.enemyTimer += deltaTime;
+                this.enemyTimer += this.enemyInterval * deltaTimeSeconds;
             }
 
         }
@@ -285,8 +309,10 @@ window.addEventListener('load', function () {
         const deltaTime = timesTamp - lastTime;
         lastTime = timesTamp;
 
+        const deltaTimeSeconds = deltaTime / 1000;
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        game.update(deltaTime);
+        game.update(deltaTimeSeconds);
         game.draw(ctx);
         requestAnimationFrame(animate);
     };
