@@ -82,6 +82,8 @@ window.addEventListener('load', function () {
             this.speedY = 0;
             this.speed = Player.speed;
             this.projectiles = [];
+            this.sizeX = this.game.width - this.width;
+            this.sizeY = this.game.height - this.height;
         }
 
         update(deltaTimeSeconds) {
@@ -103,6 +105,11 @@ window.addEventListener('load', function () {
 
             this.x += this.speedX * deltaTimeSeconds;
             this.y += this.speedY * deltaTimeSeconds;
+
+            if (this.x < 0) this.x = 0;
+            if (this.x > this.sizeX) this.x = this.sizeX;
+            if (this.y < 0) this.y = 0;
+            if (this.y > this.sizeY) this.y = this.sizeY;
 
             if (this.game.keys.indexOf(' ') >= 0) {
                 this.shootTop();
