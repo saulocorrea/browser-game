@@ -129,9 +129,9 @@ window.addEventListener('load', function () {
         }
 
         shootTop() {
-            if (this.game.ammnunition > 0) {
+            if (this.game.ammunition > 0) {
                 this.projectiles.push(new Projectile(this.game, this.x + 100, this.y + 40));
-                this.game.ammnunition--;
+                this.game.ammunition--;
             }
         }
     }
@@ -208,6 +208,7 @@ window.addEventListener('load', function () {
 
         draw(context) {
             this.drawAmmunitionBar(context);
+            this.drawScore(context);
         }
 
         drawAmmunitionBar(context) {
@@ -216,17 +217,29 @@ window.addEventListener('load', function () {
             context.fillRect(
                 this.ammunitionBar.x,
                 this.ammunitionBar.y,
-                this.ammunitionBar.width * this.game.maxAmmnunition,
+                this.ammunitionBar.width * this.game.maxAmmunition,
                 this.ammunitionBar.height);
 
             context.fillStyle = this.ammunitionBar.color;
 
-            for (let i = 0; i < this.game.ammnunition; i++) {
+            for (let i = 0; i < this.game.ammunition; i++) {
                 context.fillRect(
                     this.ammunitionBar.x + this.ammunitionBar.width * i,
                     this.ammunitionBar.y,
                     this.ammunitionBar.width,
                     this.ammunitionBar.height);
+            }
+        }
+
+        drawScore(context) {
+            context.fillStyle = 'black';
+            context.font = this.fontSize + 'px ' + this.fontFamily;
+            context.fillText('Score: ' + this.game.score, 20, 100);
+            if (this.game.gameOver) {
+                context.textAlign = 'center';
+                context.fillStyle = 'red';
+                context.font = '50px ' + this.fontFamily;
+                context.fillText('GAME OVER', this.game.width / 2, this.game.height / 2);
             }
         }
     }
@@ -242,10 +255,10 @@ window.addEventListener('load', function () {
             this.enemies = [];
             this.enemyTimer = 0;
             this.enemyInterval = 2;
-            this.ammnunition = 50;
-            this.maxAmmnunition = 50;
-            this.ammnunitionTimer = 0;
-            this.ammnunitionInterval = 0.4;
+            this.ammunition = 50;
+            this.maxAmmunition = 50;
+            this.ammunitionTimer = 0;
+            this.ammunitionInterval = 0.4;
             this.gameOver = false;
             this.score = 0;
         }
@@ -253,19 +266,20 @@ window.addEventListener('load', function () {
         update(deltaTimeSeconds) {
             this.player.update(deltaTimeSeconds);
         
-            if (this.ammnunitionTimer > this.ammnunitionInterval) {
-                if (this.ammnunition < this.maxAmmnunition) {
-                    this.ammnunition++;
+            if (this.ammunitionTimer > this.ammunitionInterval) {
+                if (this.ammunition < this.maxAmmunition) {
+                    this.ammunition++;
                 }
-                this.ammnunitionTimer = 0;
+                this.ammunitionTimer = 0;
             } else {
-                this.ammnunitionTimer += deltaTimeSeconds;
+                this.ammunitionTimer += deltaTimeSeconds;
             }
 
             this.enemies.forEach(enemy => {
                 enemy.update(deltaTimeSeconds);
                 if (this.checkCollision(this.player, enemy)) {
                     enemy.markForDeletion = true;
+                    this.score -= enemy.score;
                 }
                 this.player.projectiles.forEach(projectile => {
                     if (this.checkCollision(projectile, enemy)) {
@@ -287,6 +301,9 @@ window.addEventListener('load', function () {
                 this.enemyTimer += deltaTimeSeconds;
             }
 
+            if (this.score < 0) {
+                this.gameOver = true;
+            }
         }
 
         draw(context) {
