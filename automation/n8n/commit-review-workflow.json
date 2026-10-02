@@ -1,0 +1,448 @@
+{
+  "name": "BrowserGame-RepositoryMonitor",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -128
+      ],
+      "id": "efd78317-3fae-4a8a-807e-39c7794362e1",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/repos/saulocorrea/browser-game/commits",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "per_page",
+              "value": "5"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -96,
+        -128
+      ],
+      "id": "9eb52e82-0726-482f-9156-3b70fd7b8596",
+      "name": "Get All Commits"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "feb1da3a-e7d2-4265-a4ca-eb847416dbf7",
+              "name": "sha",
+              "value": "={{ $json.sha }}",
+              "type": "string"
+            },
+            {
+              "id": "ebd886de-d56e-4099-897a-6791443e810a",
+              "name": "message",
+              "value": "={{ $json.commit.message }}",
+              "type": "string"
+            },
+            {
+              "id": "4d31dbab-df75-4da3-9a28-1a0e76b05936",
+              "name": "author",
+              "value": "={{ $json.commit.author.name }}",
+              "type": "string"
+            },
+            {
+              "id": "5a920551-11b2-4d9f-9430-2f70b9fddbe9",
+              "name": "date",
+              "value": "={{ $json.commit.author.date }}",
+              "type": "string"
+            },
+            {
+              "id": "679aabf6-16bc-411e-a98a-cda7608eb875",
+              "name": "email",
+              "value": "={{ $json.commit.author.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        80,
+        -128
+      ],
+      "id": "59743e16-a367-4846-a3ef-e02488b3c666",
+      "name": "Flat to DTO"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bad159e2-a25e-40c6-bab4-7b35a0feea94",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "=Merge",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        256,
+        -128
+      ],
+      "id": "0e4fc87a-a003-4cca-a4b4-7e1e758343ee",
+      "name": "Remove \"Merge\" commits"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/saulocorrea/browser-game/commits/{{ $json.sha }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        -128
+      ],
+      "id": "0c7f2d2f-cd3c-4470-a563-9578662a0ea2",
+      "name": "Get Commit Infos"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d809fc1-29f8-468a-a642-c957fb5e6e87",
+              "name": "sha",
+              "value": "={{ $json.sha }}",
+              "type": "string"
+            },
+            {
+              "id": "d409a8eb-2ad3-4c9e-8922-4a4231e04024",
+              "name": "message",
+              "value": "={{ $json.commit.message }}",
+              "type": "string"
+            },
+            {
+              "id": "540c9997-5f59-469f-aff1-67b31fe9fa4b",
+              "name": "additions",
+              "value": "={{ $json.stats.additions }}",
+              "type": "number"
+            },
+            {
+              "id": "b1a85b72-7ed5-4af2-9a21-cc5eb8047a44",
+              "name": "deletions",
+              "value": "={{ $json.stats.deletions }}",
+              "type": "number"
+            },
+            {
+              "id": "e939e2f8-ef25-4a9a-9269-751588acab3c",
+              "name": "files",
+              "value": "={{ $json.files }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        640,
+        -128
+      ],
+      "id": "277431d4-6c9c-4e94-b088-0d288f0997d0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=files",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        112
+      ],
+      "id": "40289b63-4b58-4a3d-9188-84e28c0a33a2",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "888a36c0-c2c5-4668-8117-b6e67c08f562",
+              "name": "commitSha",
+              "value": "={{ $json.sha }}",
+              "type": "string"
+            },
+            {
+              "id": "3b6262bf-84b6-42be-ba08-bd3abef35244",
+              "name": "commitMessage",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            },
+            {
+              "id": "314cb97f-487f-4288-a7ea-127e09bad9f8",
+              "name": "filename",
+              "value": "={{ $json.files.filename }}",
+              "type": "string"
+            },
+            {
+              "id": "300748ca-cf1d-4431-9e32-8000466ee564",
+              "name": "status",
+              "value": "={{ $json.files.status }}",
+              "type": "string"
+            },
+            {
+              "id": "177e022f-a711-4e51-a79d-cca731f929cd",
+              "name": "fileAdditions",
+              "value": "={{ $json.files.additions }}",
+              "type": "number"
+            },
+            {
+              "id": "399605c4-2945-4cb1-9f12-4862fc78bba0",
+              "name": "fileDeletions",
+              "value": "={{ $json.files.deletions }}",
+              "type": "number"
+            },
+            {
+              "id": "08322fa7-3fbc-43a6-a040-a78062b7a42c",
+              "name": "patch",
+              "value": "={{ $json.files.patch }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -16,
+        112
+      ],
+      "id": "5ffc35c5-6939-4a62-8b6a-2e0fb8782a1b",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "qwen2.5-coder:3b",
+          "mode": "list",
+          "cachedResultName": "qwen2.5-coder:3b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are reviewing a code change from my browser-game project.\n\nCommit:\n{{ $json.commitMessage }}\n\nFile:\n{{ $json.filename }}\n\nChanges:\n+{{ $json.fileAdditions }} additions\n-{{ $json.fileDeletions }} deletions\n\nGit diff:\n{{ $json.patch }}\n\nAnalyze only the code change shown above.\nPay special attention to:\n- values that changed from milliseconds to seconds\n- timers and intervals\n- speed values and their units\n- comparisons between timers and intervals\n- variables renamed during the change\n- calculations where one value may be in milliseconds and another in seconds\n\nDo not assume that a timing conversion is correct just because deltaTimeSeconds is used.\n\nReturn:\n1. A short summary of what changed.\n2. Possible bugs or regressions introduced by this change.\n3. Logic or timing problems.\n4. A suggested improvement, if necessary.\n\nBe concise. If you cannot identify a problem from the provided diff, say so instead of inventing one."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        192,
+        112
+      ],
+      "id": "75f31605-d1a1-439b-8bd1-084fc622e94b",
+      "name": "Message a model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "9tEGzU7gEpdEvFMz",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "071ab71f-f858-4d43-b1dc-e302c1c08bea",
+              "name": "commitSha",
+              "value": "={{ $('Edit Fields1').item.json.commitSha }}",
+              "type": "string"
+            },
+            {
+              "id": "dce92184-ed6c-4701-84b6-48d01d65ed88",
+              "name": "commitMessage",
+              "value": "={{ $('Edit Fields1').item.json.commitMessage }}",
+              "type": "string"
+            },
+            {
+              "id": "ab729ae7-015e-40f6-ad78-97dc172d34a4",
+              "name": "filename",
+              "value": "={{ $('Edit Fields1').item.json.filename }}",
+              "type": "string"
+            },
+            {
+              "id": "250c4754-0ba2-42b9-8d84-566d25cbbfbc",
+              "name": "fileAdditions",
+              "value": "={{ $('Edit Fields1').item.json.fileAdditions }}",
+              "type": "number"
+            },
+            {
+              "id": "aaf8e34a-c04f-4e87-b93e-b789aa4fe591",
+              "name": "fileDeletions",
+              "value": "={{ $('Edit Fields1').item.json.fileDeletions }}",
+              "type": "number"
+            },
+            {
+              "id": "303fbf88-faa2-4d8c-9a64-4bff57e9f010",
+              "name": "aiReview",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        512,
+        112
+      ],
+      "id": "0a061d4a-286c-4405-9eb9-0dfef70896af",
+      "name": "Edit Fields2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get All Commits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Commits": {
+      "main": [
+        [
+          {
+            "node": "Flat to DTO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flat to DTO": {
+      "main": [
+        [
+          {
+            "node": "Remove \"Merge\" commits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove \"Merge\" commits": {
+      "main": [
+        [
+          {
+            "node": "Get Commit Infos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Commit Infos": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
