@@ -1,3 +1,5 @@
+import InputHandler from './src/core/InputHandler.js';
+
 window.addEventListener('load', function () {
     // Canvas setup
     var canvas = document.getElementById('canvas1');
@@ -6,7 +8,7 @@ window.addEventListener('load', function () {
     canvas.width = 1500;
     canvas.height = 500;
 
-    class InputHandler {
+    /*class InputHandler {
         constructor(game) {
             this.game = game;
             window.addEventListener('keydown', (e) => {
@@ -28,7 +30,7 @@ window.addEventListener('load', function () {
                 }
             });
         }
-    }
+    }*/
 
     class Projectile {
         static fillStyle = 'red';
@@ -90,16 +92,18 @@ window.addEventListener('load', function () {
             this.speedX = 0;
             this.speedY = 0;
 
-            if (this.game.keys.indexOf('ArrowUp') >= 0) {
+            const keys = this.game.inputHandler.keys;
+
+            if (keys.includes('ArrowUp')) {
                 this.speedY = -this.speed;
             }
-            if (this.game.keys.indexOf('ArrowDown') >= 0) {
+            if (keys.includes('ArrowDown')) {
                 this.speedY = this.speed;
             }
-            if (this.game.keys.indexOf('ArrowLeft') >= 0) {
+            if (keys.includes('ArrowLeft')) {
                 this.speedX = -this.speed;
             }
-            if (this.game.keys.indexOf('ArrowRight') >= 0) {
+            if (keys.includes('ArrowRight')) {
                 this.speedX = this.speed;
             }
 
@@ -111,9 +115,9 @@ window.addEventListener('load', function () {
             if (this.y < 0) this.y = 0;
             if (this.y > this.sizeY) this.y = this.sizeY;
 
-            if (this.game.keys.indexOf(' ') >= 0) {
+            if (keys.includes(' ')) {
                 this.shootTop();
-                this.game.keys.splice(this.game.keys.indexOf(' '), 1);
+                this.game.inputHandler.keys.splice(this.game.inputHandler.keys.indexOf(' '), 1);
             }
 
             this.projectiles.forEach(projectile => projectile.update(deltaTimeSeconds));
@@ -248,8 +252,7 @@ window.addEventListener('load', function () {
         constructor(width, height) {
             this.width = width;
             this.height = height;
-            this.keys = [];
-            this.inputHandler = new InputHandler(this);
+            this.inputHandler = new InputHandler();
             this.ui = new UI(this);
             this.player = new Player(this);
             this.enemies = [];
