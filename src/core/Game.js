@@ -1,3 +1,5 @@
+import InputHandler from './InputHandler.js';
+
 export default class Game {
     constructor(width, height) {
         this.width = width;

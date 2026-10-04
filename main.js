@@ -1,4 +1,7 @@
 import Game from './src/core/Game.js';
+import Player from './src/game/Player.js';
+import Angler1 from './src/game/Angler1.js';
+import { checkCollision } from './src/core/Collision.js';
 
 window.addEventListener('load', function () {
     // Canvas setup
@@ -8,155 +11,8 @@ window.addEventListener('load', function () {
     canvas.width = 1500;
     canvas.height = 500;
 
-    class Projectile {
-        static fillStyle = 'red';
-        static width = 10;
-        static height = 7;
-        static speed = 1000;
-
-        constructor(game, x, y) {
-            this.game = game;
-            this.x = x;
-            this.y = y;
-            this.width = Projectile.width;
-            this.height = Projectile.height;
-            this.speed = Projectile.speed;
-            this.markForDeletion = false;
-        }
-
-        update(deltaTimeSeconds) {
-            this.x += this.speed * deltaTimeSeconds;
-
-            if (this.x > this.game.width - this.width) {
-                this.markForDeletion = true;
-            }
-        }
-
-        draw(context) {
-            context.fillStyle = Projectile.fillStyle;
-            context.fillRect(this.x, this.y, this.width, this.height);
-        }
-    }
-
     class Particle {
 
-    }
-
-    class Player {
-        static fillStyle = 'black';
-        static width = 120;
-        static height = 190;
-        static x = 20;
-        static y = 100;
-        static speed = 200;
-
-        constructor(game) {
-            this.game = game;
-            this.width = Player.width;
-            this.height = Player.height;
-            this.x = Player.x;
-            this.y = Player.y;
-            this.speedX = 0;
-            this.speedY = 0;
-            this.speed = Player.speed;
-            this.projectiles = [];
-            this.sizeX = this.game.width - this.width;
-            this.sizeY = this.game.height - this.height;
-        }
-
-        update(deltaTimeSeconds) {
-            this.speedX = 0;
-            this.speedY = 0;
-
-            const keys = this.game.inputHandler.keys;
-
-            if (keys.includes('ArrowUp')) {
-                this.speedY = -this.speed;
-            }
-            if (keys.includes('ArrowDown')) {
-                this.speedY = this.speed;
-            }
-            if (keys.includes('ArrowLeft')) {
-                this.speedX = -this.speed;
-            }
-            if (keys.includes('ArrowRight')) {
-                this.speedX = this.speed;
-            }
-
-            this.x += this.speedX * deltaTimeSeconds;
-            this.y += this.speedY * deltaTimeSeconds;
-
-            if (this.x < 0) this.x = 0;
-            if (this.x > this.sizeX) this.x = this.sizeX;
-            if (this.y < 0) this.y = 0;
-            if (this.y > this.sizeY) this.y = this.sizeY;
-
-            if (keys.includes(' ')) {
-                this.shootTop();
-                this.game.inputHandler.keys.splice(this.game.inputHandler.keys.indexOf(' '), 1);
-            }
-
-            this.projectiles.forEach(projectile => projectile.update(deltaTimeSeconds));
-            this.projectiles = this.projectiles.filter(projectile => !projectile.markForDeletion);
-        }
-
-        draw(context) {
-            context.fillStyle = Player.fillStyle;
-            context.fillRect(this.x, this.y, this.width, this.height);
-            context.fillRect(this.x + this.width, this.y + 40, 20, 10);
-            
-            this.projectiles.forEach(projectile => projectile.draw(context));
-        }
-
-        shootTop() {
-            if (this.game.ammunition > 0) {
-                this.projectiles.push(new Projectile(this.game, this.x + 100, this.y + 40));
-                this.game.ammunition--;
-            }
-        }
-    }
-
-    class Enemy {
-        static lives = 1;
-        static font = '20px Helveltica';
-
-        constructor(game) {
-            this.game = game;
-            this.x = this.game.width;
-            this.speedX = Math.random() * 90 + 30;
-            this.markForDeletion = false;
-            this.lives = Enemy.lives;
-            this.score = this.lives;
-        }
-
-        update(deltaTimeSeconds) {
-            this.x -= this.speedX * deltaTimeSeconds;
-            if (this.x + this.width < 0) {
-                this.markForDeletion = true;
-            }
-        }
-
-        draw(context) {
-            context.fillStyle = 'red';
-            context.fillRect(this.x, this.y, this.width, this.height);
-            context.fillStyle = 'black';
-            context.font = Enemy.font;
-            context.fillText(this.lives, this.x, this.y);
-        }
-    }
-
-    class Angler1 extends Enemy {
-        static width = 228 * 0.2;
-        static height = 169 * 0.2;
-        static lives = 3;
-
-        constructor(game) {
-            super(game);
-            this.width = Angler1.width;
-            this.height = Angler1.height;
-            this.y = Math.random() * (this.game.height * 0.9 - this.height);
-            this.lives = Angler1.lives;
-        }
     }
 
     class Layer {
@@ -255,12 +111,12 @@ window.addEventListener('load', function () {
 
             this.enemies.forEach(enemy => {
                 enemy.update(deltaTimeSeconds);
-                if (this.checkCollision(this.player, enemy)) {
+                if (checkCollision(this.player, enemy)) {
                     enemy.markForDeletion = true;
                     this.score -= enemy.score;
                 }
                 this.player.projectiles.forEach(projectile => {
-                    if (this.checkCollision(projectile, enemy)) {
+                    if (checkCollision(projectile, enemy)) {
                         projectile.markForDeletion = true;
                         enemy.lives--;
                         if (enemy.lives > 0) return;
