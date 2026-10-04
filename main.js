@@ -1,6 +1,6 @@
 import Game from './src/core/Game.js';
 import Player from './src/game/Player.js';
-import Angler1 from './src/game/Angler1.js';
+import BasicEnemy from './src/game/BasicEnemy.js';
 import { checkCollision } from './src/core/Collision.js';
 
 window.addEventListener('load', function () {
@@ -147,7 +147,7 @@ window.addEventListener('load', function () {
         }
 
         addEnemy() {
-            this.enemies.push(new Angler1(this));
+            this.enemies.push(new BasicEnemy(this));
         }
     }
 
