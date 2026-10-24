@@ -18,8 +18,12 @@ export default class UI {
     }
 
     draw(context) {
+        context.save();
+
         this.drawAmmunitionBar(context);
         this.drawScore(context);
+
+        context.restore();
     }
 
     drawAmmunitionBar(context) {
@@ -43,12 +47,12 @@ export default class UI {
     }
 
     drawScore(context) {
-        context.fillStyle = 'black';
+        context.fillStyle = 'yelloy';
         context.font = this.fontSize + 'px ' + this.fontFamily;
         context.fillText('Score: ' + this.game.score, 20, 100);
         if (this.game.gameOver) {
             context.textAlign = 'center';
-            context.fillStyle = 'red';
+            context.fillStyle = 'brown';
             context.font = '50px ' + this.fontFamily;
             context.fillText('GAME OVER', this.game.width / 2, this.game.height / 2);
         }

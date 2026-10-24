@@ -21,19 +21,26 @@ window.addEventListener('load', function () {
     }
 
     const game = new ShooterGame(canvas.width, canvas.height);
-    let lastTime = 0;
+    let lastTime = null;
 
-    var animate = function (timesTamp) {
-        const deltaTime = timesTamp - lastTime;
-        lastTime = timesTamp;
+    document.addEventListener('visibilitychange', () => {
+        lastTime = null;
+        game.inputHandler.keys.length = 0;
+    });
 
-        const deltaTimeSeconds = deltaTime / 1000;
+    const animate = function (timestamp) {
+        const deltaTimeSeconds = lastTime === null || document.hidden
+            ? 0
+            : Math.min((timestamp - lastTime) / 1000, 0.1);
+
+        lastTime = timestamp;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         game.update(deltaTimeSeconds);
         game.draw(ctx);
+
         requestAnimationFrame(animate);
     };
 
-    animate(0);
+    requestAnimationFrame(animate);
 });

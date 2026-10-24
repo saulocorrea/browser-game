@@ -2,6 +2,10 @@ export default class InputHandler {
     constructor() {
         this.keys = [];
 
+        window.addEventListener('blur', () => {
+            this.keys.length = 0;
+        });
+
         window.addEventListener('keydown', (event) => {
             if (!this.keys.includes(event.key)) {
                 this.keys.push(event.key);

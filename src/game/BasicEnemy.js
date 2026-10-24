@@ -9,7 +9,15 @@ export default class BasicEnemy extends Enemy {
         super(game);
         this.width = BasicEnemy.width;
         this.height = BasicEnemy.height;
-        this.y = Math.random() * (this.game.height * 0.9 - this.height);
+        const minY = this.game.height * 0.9 - this.height;
+        const maxY = this.game.height * 0.7;
+        this.y = (Math.random() * minY);
+        if (this.y < minY) {
+            this.y += 50;
+        }
+        if (this.y > maxY) {
+            this.y = maxY;
+        }
         this.lives = BasicEnemy.lives;
-    }
+   }
 }

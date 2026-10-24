@@ -25,52 +25,86 @@ export default class ShooterGame extends Game {
     }
 
     update(deltaTimeSeconds) {
+        if (this.gameOver) return;
+
         this.player.update(deltaTimeSeconds);
     
-        if (this.ammunitionTimer > this.ammunitionInterval) {
+        this.ammunitionTimer += deltaTimeSeconds;
+
+        while (this.ammunitionTimer + 1e-9 >= this.ammunitionInterval) {
+            this.ammunitionTimer = Math.max(
+                0,
+                this.ammunitionTimer - this.ammunitionInterval
+            );
+
             if (this.ammunition < this.maxAmmunition) {
                 this.ammunition++;
+            } else {
+                this.ammunitionTimer = 0;
+                break;
             }
-            this.ammunitionTimer = 0;
-        } else {
-            this.ammunitionTimer += deltaTimeSeconds;
         }
 
         this.enemies.forEach(enemy => {
+            if (this.gameOver) return;
+
             enemy.update(deltaTimeSeconds);
+
+            if (enemy.markForDeletion) return;
+
             if (checkCollision(this.player, enemy)) {
                 enemy.markForDeletion = true;
                 this.score -= enemy.score;
+
+                if (this.score < 0) {
+                    this.gameOver = true;
+                }
+                return;
             }
+
             this.player.projectiles.forEach(projectile => {
+                if (projectile.markForDeletion || enemy.markForDeletion) {
+                    return;
+                }
+
                 if (checkCollision(projectile, enemy)) {
                     projectile.markForDeletion = true;
                     enemy.lives--;
-                    if (enemy.lives > 0) return;
-                    
-                    enemy.markForDeletion = true;
-                    this.score += enemy.score;
+
+                    if (enemy.lives <= 0) {
+                        enemy.markForDeletion = true;
+                        this.score += enemy.score;
+                    }
                 }
             });
         });
-        this.enemies = this.enemies.filter(enemy => !enemy.markForDeletion);
 
-        if (!this.gameOver && this.enemyTimer > this.enemyInterval) {
-            this.addEnemy();
-            this.enemyTimer = 0;
-        } else {
+        this.player.projectiles = this.player.projectiles.filter(
+            projectile => !projectile.markForDeletion
+        );
+
+        this.enemies = this.enemies.filter(
+            enemy => !enemy.markForDeletion
+        );
+
+        if (!this.gameOver) {
             this.enemyTimer += deltaTimeSeconds;
-        }
 
-        if (this.score < 0) {
-            this.gameOver = true;
+            while (this.enemyTimer + 1e-9 >= this.enemyInterval) {
+                this.enemyTimer = Math.max(
+                    0,
+                    this.enemyTimer - this.enemyInterval
+                );
+
+                this.addEnemy();
+            }
         }
     }
 
     draw(context) {
         this.player.draw(context);
-        this.ui.draw(context);
         this.enemies.forEach(enemy => enemy.draw(context));
+        this.ui.draw(context);
     }
 
     addEnemy() {
