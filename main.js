@@ -8,18 +8,6 @@ window.addEventListener('load', function () {
     canvas.width = 1500;
     canvas.height = 500;
 
-    class Particle {
-
-    }
-
-    class Layer {
-
-    }
-
-    class Background {
-
-    }
-
     const game = new ShooterGame(canvas.width, canvas.height);
     let lastTime = null;
 

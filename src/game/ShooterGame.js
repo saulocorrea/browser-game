@@ -2,6 +2,7 @@
 
 import Game from '../core/Game.js';
 import { checkCollision } from '../core/Collision.js';
+import Background from '../game/Background.js';
 
 import UI from '../game/UI.js';
 import Player from '../game/Player.js';
@@ -11,6 +12,7 @@ export default class ShooterGame extends Game {
     constructor(width, height) {
         super(width, height);
         
+        this.background = new Background(this);
         this.ui = new UI(this);
         this.player = new Player(this);
         this.enemies = [];
@@ -21,12 +23,23 @@ export default class ShooterGame extends Game {
         this.ammunitionTimer = 0;
         this.ammunitionInterval = 0.4;
         this.gameOver = false;
+        this.gameTimer = 0;
+        this.gameTimerLimit = 20000;
         this.score = 0;
+        this.speed = 1;
     }
 
     update(deltaTimeSeconds) {
+        if (!this.gameOver) { 
+            this.gameTimer += deltaTimeSeconds;
+        }
+        if (this.gameTimer > this.gameTimerLimit) {
+            this.gameOver = true;
+        }
         if (this.gameOver) return;
 
+        this.background.update();
+        this.background.layer4.update();
         this.player.update(deltaTimeSeconds);
     
         this.ammunitionTimer += deltaTimeSeconds;
@@ -102,9 +115,11 @@ export default class ShooterGame extends Game {
     }
 
     draw(context) {
+        this.background.draw(context);
         this.player.draw(context);
         this.enemies.forEach(enemy => enemy.draw(context));
         this.ui.draw(context);
+        this.background.layer4.draw(context);
     }
 
     addEnemy() {
