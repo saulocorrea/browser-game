@@ -1,3 +1,8 @@
+# Run APP
+
+# npm install
+# npm start
+
 # n8n AI Commit Review
 
 This workflow uses n8n to retrieve recent commits from the browser-game
