@@ -20,6 +20,10 @@ export default class Player {
         this.projectiles = [];
         this.sizeX = this.game.width - this.width;
         this.sizeY = this.game.height - this.height;
+        this.image = document.getElementById('player');
+        this.frameX = 0;
+        this.frameY = 0;
+        this.maxFrame = 37;
     }
 
     update(deltaTimeSeconds) {
@@ -40,6 +44,9 @@ export default class Player {
         if (keys.includes('ArrowRight')) {
             this.speedX = this.speed;
         }
+        if (keys.includes('d')) {
+            this.game.debug = !this.game.debug;
+        }
 
         this.x += this.speedX * deltaTimeSeconds;
         this.y += this.speedY * deltaTimeSeconds;
@@ -56,12 +63,32 @@ export default class Player {
 
         this.projectiles.forEach(projectile => projectile.update(deltaTimeSeconds));
         this.projectiles = this.projectiles.filter(projectile => !projectile.markForDeletion);
+
+        //sprite animation
+        if (this.frameX < this.maxFrame) {
+            this.frameX++;
+        } else {
+            this.frameX = 0;
+        }
     }
 
     draw(context) {
         context.fillStyle = Player.fillStyle;
-        context.fillRect(this.x, this.y, this.width, this.height);
-        context.fillRect(this.x + this.width, this.y + 40, 20, 10);
+        
+        if (this.game.debug) {
+            context.strokeRect(this.x, this.y, this.width, this.height);
+        }
+        
+        context.drawImage(
+            this.image, 
+            this.frameX * this.width, 
+            this.frameY * this.height, 
+            this.width, 
+            this.height, 
+            this.x, 
+            this.y, 
+            this.width, 
+            this.height);
         
         this.projectiles.forEach(projectile => projectile.draw(context));
     }

@@ -5,6 +5,7 @@ export default class Game {
         this.width = width;
         this.height = height;
         this.inputHandler = new InputHandler();
+        this.debug = false;
     }
 
     update(deltaTime) {}
