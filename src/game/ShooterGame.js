@@ -7,6 +7,7 @@ import Background from '../game/Background.js';
 import UI from '../game/UI.js';
 import Player from '../game/Player.js';
 import BasicEnemy from '../game/BasicEnemy.js';
+import IntermediateEnemy from '../game/IntermediateEnemy.js';
 
 export default class ShooterGame extends Game {
     constructor(width, height) {
@@ -123,6 +124,11 @@ export default class ShooterGame extends Game {
     }
 
     addEnemy() {
-        this.enemies.push(new BasicEnemy(this));
+        const randomize = Math.random();
+        if (randomize < 0.5) {
+            this.enemies.push(new BasicEnemy(this));
+        } else {
+            this.enemies.push(new IntermediateEnemy(this));
+        }
     }
 }

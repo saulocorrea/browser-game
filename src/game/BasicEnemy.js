@@ -1,9 +1,9 @@
 import Enemy from './Enemy.js';
 
 export default class BasicEnemy extends Enemy {
-    static width = 228 * 0.2;
-    static height = 169 * 0.2;
-    static lives = 3;
+    static width = 228;
+    static height = 169;
+    static lives = 1;
 
     constructor(game) {
         super(game);
@@ -19,5 +19,13 @@ export default class BasicEnemy extends Enemy {
             this.y = maxY;
         }
         this.lives = BasicEnemy.lives;
+
+        this.image = document.getElementById('angler1');
+        this.frameY = Math.floor(Math.random() * 3);
    }
+
+   draw(context) {
+        context.fillStyle = 'yellow';
+        super.draw(context);
+    }
 }

@@ -1,7 +1,7 @@
 export default class Projectile {
     static fillStyle = 'red';
-    static width = 10;
-    static height = 7;
+    static width = 40;
+    static height = 15;
     static speed = 1000;
 
     constructor(game, x, y) {
@@ -12,6 +12,7 @@ export default class Projectile {
         this.height = Projectile.height;
         this.speed = Projectile.speed;
         this.markForDeletion = false;
+        this.image = document.getElementById('projectile');
     }
 
     update(deltaTimeSeconds) {
@@ -24,6 +25,15 @@ export default class Projectile {
 
     draw(context) {
         context.fillStyle = Projectile.fillStyle;
-        context.fillRect(this.x, this.y, this.width, this.height);
+        if (this.game.debug) {
+            context.strokeRect(this.x, this.y, this.width, this.height);
+        }
+        context.drawImage(
+            this.image,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
     }
 }
