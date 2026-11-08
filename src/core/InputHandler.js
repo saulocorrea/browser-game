@@ -7,6 +7,10 @@ export default class InputHandler {
         });
 
         window.addEventListener('keydown', (event) => {
+            if (event.key === 'd' && event.repeat) {
+                return;
+            }
+
             if (!this.keys.includes(event.key)) {
                 this.keys.push(event.key);
             }
