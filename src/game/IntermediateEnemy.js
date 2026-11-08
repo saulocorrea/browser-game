@@ -19,6 +19,7 @@ export default class IntermediateEnemy extends Enemy {
             this.y = maxY;
         }
         this.lives = IntermediateEnemy.lives;
+        this.score = this.lives;
 
         this.image = document.getElementById('angler2');
         this.frameY = Math.floor(Math.random() * 2);

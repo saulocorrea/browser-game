@@ -52,9 +52,18 @@ export default class UI {
         context.fillText('Score: ' + this.game.score, 20, 100);
         if (this.game.gameOver) {
             context.textAlign = 'center';
-            context.fillStyle = 'brown';
+            context.fillStyle = 'white';
             context.font = '50px ' + this.fontFamily;
-            context.fillText('GAME OVER', this.game.width / 2, this.game.height / 2);
+            
+            const message = this.game.score >= this.game.winningScore
+                ? 'YOU WIN!'
+                : 'YOU LOSE!';
+
+            context.fillText(
+                message, 
+                this.game.width / 2, 
+                this.game.height / 2
+            );
         }
     }
 }

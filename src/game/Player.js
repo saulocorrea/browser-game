@@ -46,6 +46,7 @@ export default class Player {
         }
         if (keys.includes('d')) {
             this.game.debug = !this.game.debug;
+            keys.splice(keys.indexOf('d'), 1);
         }
 
         this.x += this.speedX * deltaTimeSeconds;

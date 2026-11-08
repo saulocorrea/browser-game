@@ -25,8 +25,9 @@ export default class ShooterGame extends Game {
         this.ammunitionInterval = 0.4;
         this.gameOver = false;
         this.gameTimer = 0;
-        this.gameTimerLimit = 20000;
+        this.gameTimerLimit = 20;
         this.score = 0;
+        this.winningScore = 100;
         this.speed = 1;
     }
 
